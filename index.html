@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Taxi Business Records</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mut:#667085;--bd:#dde1e6;--ac:#0b6e4f;--ac2:#e6f4ee;--bad:#b42318}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171a;--card:#1d2125;--tx:#e8eaed;--mut:#98a2b3;--bd:#323840;--ac:#3fb98b;--ac2:#18332b;--bad:#f97066;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171a;--card:#1d2125;--tx:#e8eaed;--mut:#98a2b3;--bd:#323840;--ac:#3fb98b;--ac2:#18332b;--bad:#f97066;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1320px;margin:0 auto;padding-block:14px;padding-inline:16px}
+h1{font-size:20px;margin:4px 0 12px}h2{font-size:16px;margin:0 0 8px}
+.card{min-width:0;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select,input,button{font:inherit;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--card);color:var(--tx);max-width:100%;min-width:0}
+button{cursor:pointer}button.on,button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+button:disabled,select:disabled,input:disabled{opacity:.55;cursor:default}
+input[readonly]{background:var(--ac2);font-weight:600}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:5px 8px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+th{font-size:12px;color:var(--mut);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.k td{font-weight:600;background:var(--ac2)}.mut{color:var(--mut);font-size:13px}.bad{color:var(--bad)}
+.sh{background:var(--ac2);padding:6px 8px;border-radius:6px;margin:10px 0 2px;font-weight:600;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+label{display:flex;flex-direction:column;font-size:13px;color:var(--mut);gap:3px;min-width:0}
+h3{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;margin:18px 0 8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;text-align:left;min-width:0;background:var(--card);border:1px solid var(--bd);border-radius:10px}
+.tile b{font-size:15px}.tile span{font-size:13px;color:var(--mut)}
+.tile:hover:not(:disabled){border-color:var(--ac)}.tile:disabled{opacity:.55;cursor:default}
+.nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.nav .pos{min-width:120px;text-align:center;font-weight:600}
+.nav .go{display:flex;flex-direction:row;align-items:center;gap:6px}
+.nav .go input{width:110px}
+label.ck{flex-direction:row;align-items:center;gap:8px}label.ck input{width:20px;height:20px;padding:0}
+#tl th,#tl td,#led th,#led td{white-space:normal;padding:4px 5px;font-size:12px;vertical-align:top}
+#tlh th,#tlh td,#tlb td{white-space:normal;padding:4px 5px;font-size:12px;vertical-align:top}
+.tlw{overflow:hidden;scrollbar-gutter:stable}.tlbody{overflow-y:auto;max-height:46vh;border-top:1px solid var(--bd)}
+#tlh input:not([type=checkbox]),#tlh select{width:100%;padding:4px 5px;font-size:12px}
+button.dng,#sdel,button.del{background:var(--bad);color:#fff;border-color:var(--bad)}button.dng{outline:3px solid var(--bad);outline-offset:2px}button.del{padding:2px 7px;font-size:12px}
+.warn{border:2px solid var(--bad);color:var(--bad);border-radius:8px;padding:8px 10px;margin:8px 0;font-weight:600;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.warn[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+#login{max-width:420px;margin:40px auto}#login form{grid-template-columns:1fr}
+</style></head><body>
+<main>
+<div class="top"><h1>Taxi Business Records</h1><div id="who" hidden><span class="mut" id="whoe"></span> <button type="button" id="so">Sign out</button></div></div>
+<div id="msg" class="card mut">Loading…</div>
+<div id="login" class="card" hidden><h2>Sign in</h2><p class="mut">Only approved logins can see the records.</p><form id="lf"><label>Email<input id="lem" type="email" autocomplete="username" required></label><label>Password<input id="lpw" type="password" autocomplete="current-password" required></label><button class="pri" id="lgo">Sign in</button></form><p id="lerr" class="bad"></p></div>
+<div id="app" hidden>
+<div id="home"><h2>Main Switchboard</h2>
+<p class="mut">Choose what you want to do. The shift date is the reporting date for everything.</p>
+<h3>Enter data</h3><div class="tiles">
+<button class="tile" data-go="add" data-new="1"><b>Exp Per Taxi Y GST</b><span>Start a new shift, then add its records</span></button></div>
+<h3>Reports</h3><div class="tiles">
+<button class="tile" data-go="rep"><b>BAS / GST report</b><span>Any financial year or quarter</span></button>
+<button class="tile" data-go="led"><b>Shift ledger</b><span>Every shift with its transactions</span></button></div>
+<h3>Coming soon</h3><div class="tiles">
+<button class="tile" disabled><b>Driver invoice</b><span>Not built yet</span></button>
+<button class="tile" disabled><b>Financial report</b><span>Not built yet</span></button>
+<button class="tile" disabled><b>General ledger</b><span>Not built yet</span></button>
+<button class="tile" disabled><b>BAS statement</b><span>Not built yet</span></button></div></div>
+<div id="work" hidden>
+<div class="bar"><button id="hb">Main Switchboard</button><select id="per"></select>
+<button data-t="rep" class="on">BAS / GST report</button><button data-t="led">Shift ledger</button><button data-t="add">Exp Per Taxi Y GST</button></div>
+<div id="rep"></div><div id="led" hidden></div>
+<div id="add" hidden>
+<div class="card"><h2>Shift</h2>
+<div class="nav"><button type="button" id="nf">« First</button><button type="button" id="np">‹ Previous</button>
+<span class="pos" id="npos"></span><button type="button" id="nn">Next ›</button><button type="button" id="nl">Last »</button>
+<button type="button" id="nw" class="pri">New shift</button><button type="button" id="sdel">Delete shift</button>
+<label class="go">Go to shift no.<input id="gno" type="number" inputmode="numeric"></label><button type="button" id="gb">Go</button></div>
+<div id="dws" class="warn" hidden></div><form id="fs"><label>Period from<input id="sdt" type="text" inputmode="numeric" placeholder="dd/mm/yy" required></label><label>Period to<input id="sdt2" type="text" inputmode="numeric" placeholder="dd/mm/yy"></label>
+<label>Taxi ref no.<select id="stx"></select></label><label>Shift no.<input id="sno" readonly placeholder="Automatic"></label>
+<label>Operator name<input id="sop" readonly></label><label>Month<input id="smo" readonly></label><label>Quarter<input id="sqt" readonly></label>
+<label>Year<input id="syr" readonly></label><label>Financial year<input id="sfy" readonly></label>
+<label>Driver<select id="sdr"></select></label><label>Shift note<input id="snote"></label>
+<label>Kilometres<input id="skm" type="number" inputmode="numeric"></label><label>Fleet<input id="sfl" readonly></label>
+<label>MDT<input id="smdt"></label><label>Transaction date<input id="sdx" readonly></label><label><span>&nbsp;</span><button class="pri" id="ssv">Save shift</button></label></form></div>
+<div class="card"><h2 id="rh">Operator General Expenses - GST Included</h2><p class="mut" id="rnote"></p>
+<form id="ft" style="display:none"></form><datalist id="dl"></datalist><div id="dwr" class="warn" hidden></div><div id="tlh" class="tlw"></div><div id="tlb" class="tlw tlbody"></div><p id="tlt"></p></div>
+<p id="st" class="mut"></p></div></div></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const R=n=>Math.round(n),M=n=>(R(n)<0?'-':'')+'$'+Math.abs(R(n)).toLocaleString('en-AU'),M2=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+const MN=['','Jan–Mar','Apr–Jun','Jul–Sep','Oct–Dec'];
+const fd=i=>/^\d{4}-\d\d-\d\d$/.test(i||'')?i.slice(8)+'/'+i.slice(5,7)+'/'+i.slice(2,4):(i||'');
+const pd=t=>{const m=String(t||'').trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/);if(!m)return'';const y=m[3].length==2?2000+ +m[3]:+m[3],mo=+m[2],d=+m[1],dt=new Date(y,mo-1,d);if(dt.getFullYear()!=y||dt.getMonth()!=mo-1||dt.getDate()!=d)return'';return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0')};
+const gv=id=>pd($('#'+id).value);
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())};
+let SX={},busy=false,DB,LK,P={shifts:[],rows:[]},SH=[],mode='view',idx=0,curShift=0;
+const nm=(a,id)=>(a.find(x=>x[0]==id)||[0,'#'+id])[1];
+const qk=d=>{const[y,m]=d.split('-');return y+'-Q'+Math.ceil(m/3)};
+
+const SB_URL='https://alcpyajvopjufovidlhu.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsY3B5YWp2b3BqdWZvdmlkbGh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3MTU0NzgsImV4cCI6MjEwNzI5MTQ3OH0.7YQ4AtAUqHCXMSDGTbfFODbqzgVychkI-6zxtdCUiFU';
+const N=x=>x==null||x===''?0:Number(x);
+const toShift=s=>[s.shift_no,s.date_from,s.taxi_no,s.driver_no,N(s.odo_start),N(s.odo_end),s.shift_type||'',s.date_to||s.date_from,s.note||'',s.mdt||'',s.transaction_date||''];
+const toRow=r=>[r.record_no,r.shift_no,r.docket_date||'',r.description||'',r.supplier_no==null?0:r.supplier_no,r.pay_method||'',N(r.od),N(r.gst),N(r.oprtr_g1),N(r.oprtr_g10),N(r.oprtr_g11),N(r.drvr_g1),N(r.drvr_g11),r.docket_ref||'',r.note||'',N(r.m),N(r.nxt_srvc),r.transaction_date||''];
+const REAL=(()=>{let sb;
+ const ck=r=>{if(r.error)throw r.error;return r.data};
+ async function all(build){let out=[],from=0;for(;;){const d=ck(await build().range(from,from+999));out=out.concat(d);if(d.length<1000)return out;from+=1000}}
+ return{
+  async init(){sb=window.supabase.createClient(SB_URL,SB_KEY)},
+  async session(){const{data}=await sb.auth.getSession();return data.session?data.session.user.email:null},
+  async login(e,p){const r=await sb.auth.signInWithPassword({email:e,password:p});return ck(r).user.email},
+  async logout(){await sb.auth.signOut()},
+  async lookups(){
+   const g=(t,o)=>all(()=>sb.from(t).select('*').order(o));
+   const[ops,drv,sup,tx,ds]=await Promise.all([g('operators','operator_no'),g('drivers','driver_no'),g('suppliers','supplier_no'),g('taxis','taxi_no'),g('descriptions','description')]);
+   const codes={};ds.forEach(d=>{if(d.code)codes[d.description]=d.code});
+   return{operators:ops.map(o=>[o.operator_no,o.name]),drivers:drv.map(d=>[d.driver_no,d.name]),suppliers:sup.map(s=>[s.supplier_no,s.name]),taxis:tx.map(t=>[t.taxi_no,t.plate,t.operator_no,t.fleet||'']),descriptions:ds.map(d=>d.description),codes}},
+  async bounds(){const a=ck(await sb.from('shifts').select('date_from').order('date_from').limit(1)),b=ck(await sb.from('shifts').select('date_from').order('date_from',{ascending:false}).limit(1));return[a[0]&&a[0].date_from,b[0]&&b[0].date_from]},
+  async fetch(a,b){
+   const sh=await all(()=>sb.from('shifts').select('*').gte('date_from',a).lte('date_from',b).order('shift_no'));
+   const rw=await all(()=>sb.from('records').select('*,shifts!inner(date_from)').gte('shifts.date_from',a).lte('shifts.date_from',b).order('record_no'));
+   return{shifts:sh.map(toShift),rows:rw.map(toRow)}},
+  async addShift(s){return ck(await sb.from('shifts').insert(s).select('shift_no').single()).shift_no},
+  async addRec(r){return ck(await sb.from('records').insert(r).select('record_no').single()).record_no},
+  async delRec(no){const d=ck(await sb.from('records').delete().eq('record_no',no).select('record_no'));if(!d.length)throw new Error('record was not deleted')},
+  async delShift(no){ck(await sb.from('records').delete().eq('shift_no',no).select('record_no'));const d=ck(await sb.from('shifts').delete().eq('shift_no',no).select('shift_no'));if(!d.length)throw new Error('shift was not deleted')}
+ }})();
+const pad2=n=>String(n).padStart(2,'0');
+function quartersBetween(a,b){const o=[];if(!a||!b)return o;let[y,m]=a.split('-').map(Number);const[y2,m2]=b.split('-').map(Number);let q=Math.ceil(m/3);const q2=Math.ceil(m2/3);
+ while(y<y2||(y==y2&&q<=q2)){o.push(y+'-Q'+q);q++;if(q>4){q=1;y++}}return o}
+function rangeOf(v){
+ if(v=='A')return['1900-01-01','2999-12-31'];
+ if(v[0]=='F'){const y=+v.slice(1);return[(y-1)+'-07-01',y+'-06-30']}
+ const[y,q]=v.slice(1).split('-Q').map(Number),last=new Date(y,q*3,0).getDate();
+ return[y+'-'+pad2((q-1)*3+1)+'-01',y+'-'+pad2(q*3)+'-'+pad2(last)]}
+function buildPer(sel){
+ const qs=LK.quarters,o=[];const yrs=[...new Set(qs.map(k=>{const[y,q]=k.split('-Q');return q>2?+y+1:+y}))];
+ o.push('<option value="A">All shifts (Jul 2018 onward)</option>');
+ o.push('<optgroup label="Financial year">'+yrs.map(y=>'<option value="F'+y+'">FY'+(y-1)+'-'+String(y).slice(2)+'</option>').join('')+'</optgroup>');
+ o.push('<optgroup label="BAS quarter">'+[...qs].reverse().map(k=>'<option value="Q'+k+'">'+MN[k.slice(-1)]+' '+k.slice(0,4)+'</option>').join('')+'</optgroup>');
+ $('#per').innerHTML=o.join('');$('#per').value=sel||'A';
+}
+function setup(){
+ buildPer();
+ const opt=(a,f)=>a.map(f).join('');
+ $('#dl').innerHTML=opt(LK.descriptions,x=>'<option value="'+esc(x)+'">');
+ $('#stx').innerHTML=opt(LK.taxis,x=>'<option value="'+x[0]+'">'+esc(x[1])+' · '+x[0]+'</option>');
+ $('#sdr').innerHTML=opt(LK.drivers,x=>'<option value="'+x[0]+'">'+esc(x[1])+'</option>');
+}
+async function load(){
+ const v=$('#per').value;$('#st').textContent='Loading…';
+ try{const[a,b]=rangeOf(v);P=await DB.fetch(a,b)}catch(x){$('#st').textContent='Could not load: '+(x.message||x.code||x);return}
+ $('#st').textContent='';render();
+}
+function calc(rows){
+ const o={g1:0,g10:0,g11:0,g14:0,pin:0,pout:0},d={g1:0,g10:0,g11:0,g14:0,pin:0,pout:0};
+ for(const r of rows){const[,,,ds,,,,gs,o1,o10,o11,d1,d11]=r;
+  o.g1+=o1;o.g10+=o10;o.g11+=o11;d.g1+=d1;d.g11+=d11;
+  if(!gs){o.g14+=o11;d.g14+=d11}
+  if(ds==='Payin'){o.pin+=o1;o.pout+=o11}}
+ return[o,d]}
+const amt=r=>r[8]+r[11]-r[9]-r[10]-r[12];
+function render(){
+ const[o,d]=calc(P.rows),t={};for(const k in o)t[k]=o[k]+d[k];
+ const row=(l,c,f,b)=>'<tr'+(b?' class="k"':'')+'><td>'+l+'</td><td class="mut">'+c+'</td>'+[f(o),f(d),f(t)].map(x=>'<td class="n">'+M(x)+'</td>').join('')+'</tr>';
+ const g12=x=>x.g10+x.g11,g17=x=>g12(x)-x.g14;
+ $('#rep').innerHTML='<div class="card sc"><h2>GST summary (by shift date)</h2><table><tr><th>Item</th><th>BAS</th><th class="n">Operator</th><th class="n">Driver</th><th class="n">Total</th></tr>'+
+ row('Total sales / income','G1',x=>x.g1,1)+row('GST on sales','G9 / 1A',x=>x.g1/11,1)+
+ row('Capital purchases','G10',x=>x.g10)+row('Other purchases','G11',x=>x.g11)+row('Total purchases','G12',g12)+
+ row('Purchases with no GST in price','G14 / G16',x=>x.g14)+row('Creditable purchases','G17',g17)+
+ row('GST credit on purchases','G20 / 1B',x=>g17(x)/11,1)+row('Net GST (1A − 1B)','',x=>x.g1/11-g17(x)/11,1)+
+ '</table><p class="mut">'+P.rows.length+' records in '+P.shifts.length+' shifts. Pay-ins are included above and shown separately here: received from drivers '+M(t.pin)+', paid to drivers '+M(t.pout)+'.</p></div>';
+ SH=[...P.shifts].sort((a,b)=>a[1]<b[1]?-1:a[1]>b[1]?1:a[0]-b[0]);
+ const by={};for(const r of P.rows)(by[r[1]]=by[r[1]]||[]).push(r);let h='';
+ for(const s of SH){const rs=(by[s[0]]||[]).sort((a,b)=>a[0]-b[0]);let i=0,e=0;rs.forEach(r=>{i+=r[8]+r[11];e+=r[9]+r[10]+r[12]});
+  h+='<div class="sh"><span>Shift '+s[0]+' · '+fd(s[1])+' · '+esc(nm(LK.taxis,s[2]))+' · '+esc(nm(LK.drivers,s[3]))+(s[5]>s[4]?' · '+(s[5]-s[4])+' km':'')+'</span><span>In '+M2(i)+' · Out '+M2(e)+'</span></div>';
+  if(rs.length)h+='<div class="sc"><table>'+rs.map(r=>'<tr><td class="mut">Rec '+r[0]+'</td><td>'+fd(r[2])+'</td><td>'+esc(r[3])+'</td><td>'+esc(nm(LK.suppliers,r[4]))+'</td><td>'+esc(r[5])+'</td><td>'+(r[6]?'Operator':'Driver')+'</td><td>'+(r[7]?'GST':'No GST')+'</td><td class="n">'+M2(amt(r))+'</td></tr>').join('')+'</table></div>';
+  else h+='<div class="mut">No records</div>'}
+ const orphan=P.rows.filter(r=>!P.shifts.some(s=>s[0]==r[1])).length;
+ $('#led').innerHTML='<div class="card"><h2>Shift ledger</h2><p class="mut">Amounts: income positive, expenses negative.'+(orphan?' <span class="bad">'+orphan+' records have no shift.</span>':'')+'</p>'+(h||'<p class="mut">No shifts in this period.</p>')+'</div>';
+ if(mode=='view'){const i=SH.findIndex(s=>s[0]==curShift);idx=i>=0?i:SH.length-1}
+ showShift();
+}
+const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function hdrCalc(){const d=gv('sdt');
+ if(!d){['smo','sqt','syr','sfy'].forEach(i=>$('#'+i).value='');return}
+ const[y,m]=d.split('-').map(Number),yy=String(y).slice(2),q=Math.floor((m-1)/3),f=m>=7?y:y-1;
+ $('#smo').value=MS[m-1]+'-'+yy;$('#sqt').value=MS[q*3]+'-'+MS[q*3+2]+'-'+yy;$('#syr').value=y;
+ $('#sfy').value=String(f).slice(2)+'-'+String(f+1).slice(2)}
+function taxiInfo(){const t=LK.taxis.find(x=>x[0]==$('#stx').value),o=t&&(LK.operators||[]).find(x=>x[0]==t[2]);
+ $('#sop').value=o?o[1]:'';$('#sfl').value=t?t[3]||'':''}
+$('#sdt').onchange=()=>{if(mode=='new'){const a=gv('sdt'),b=gv('sdt2');if(a)$('#sdt').value=fd(a);if(a&&(!b||b<a))$('#sdt2').value=fd(a);else if(b)$('#sdt2').value=fd(b);hdrCalc()}};
+$('#sdt2').onchange=()=>{const b=gv('sdt2');if(b)$('#sdt2').value=fd(b)};
+document.addEventListener('change',e=>{if(e.target.id=='tdt'){const b=gv('tdt');if(b)e.target.value=fd(b)}});
+$('#stx').onchange=taxiInfo;
+function showShift(){
+ const nw=mode=='new',s=nw?null:SH[idx];
+ $('#npos').textContent=nw?'New shift':(SH.length?'Shift '+(idx+1)+' of '+SH.length:'No shifts in this period');
+ const clr=()=>['sno','sdt','sdt2','snote','skm','smdt'].forEach(i=>$('#'+i).value='');$('#sdx').value='';
+ if(nw)clr();
+ else if(s){$('#sno').value=s[0];$('#sdt').value=fd(s[1]);$('#sdt2').value=fd(s[7]||s[1]);$('#stx').value=s[2];$('#sdr').value=s[3];$('#snote').value=s[8]||'';$('#skm').value=s[5]>s[4]?s[5]-s[4]:'';$('#smdt').value=s[9]||''}
+ else clr();
+ $('#sdx').value=nw?fd(today()):s?fd(s[10]||SX[s[0]]||''):'';
+ hdrCalc();taxiInfo();
+ ['sdt','sdt2','stx','sdr','snote','skm','smdt'].forEach(i=>{$('#'+i).disabled=!nw});
+ $('#ssv').hidden=!nw;$('#sdel').hidden=nw||!s;
+ const none=!SH.length;
+ $('#nf').disabled=none||(!nw&&idx<=0);
+ $('#np').disabled=none||(!nw&&idx<=0);
+ $('#nn').disabled=none||nw||idx>=SH.length-1;
+ $('#nl').disabled=none||(!nw&&idx>=SH.length-1);
+ const sid=s?s[0]:0;curShift=sid;
+
+
+ $('#rnote').textContent=sid?'Add as many records as you need to this shift. Each record gets its own record number automatically. Amounts include GST when GST is ticked.':(nw?'Save the shift first. Then you can add its records.':'Use New shift to start a shift.');
+ showTl(sid);
+}
+const cd=d=>(LK.codes||{})[String(d).trim()]||'';
+const recAmt=r=>r[10];
+const CG='<colgroup>'+[5,7,7,11,11,5,8,3,3,3,6,16,8,7].map(w=>'<col style="width:'+w+'%">').join('')+'</colgroup>';
+function showTl(sid){
+ const sh0=SH.find(x=>x[0]==sid);
+ const rs=sid?P.rows.filter(r=>r[1]==sid&&r[10]).sort((a,b)=>a[0]-b[0]):[];let mt=0;rs.forEach(r=>mt+=recAmt(r));
+ const amtc=r=>M2(recAmt(r));
+ $('#tlb').innerHTML='<table style="table-layout:fixed">'+CG+rs.map(r=>'<tr><td>'+r[0]+'</td><td>'+fd(r[2])+'</td><td>'+esc(r[13])+'</td><td>'+esc(nm(LK.suppliers,r[4]))+'</td><td>'+esc(r[3])+'</td><td>'+esc(cd(r[3]))+'</td><td class="n">'+amtc(r)+'</td><td>'+(r[7]?'✓':'')+'</td><td>'+(r[6]?'✓':'')+'</td><td>'+(r[15]?'✓':'')+'</td><td>'+(r[16]?esc(r[16]):'')+'</td><td>'+esc(r[14]||'')+'</td><td>'+esc(fd(r[17]))+'</td><td><button type="button" class="del" data-lbl="Confirm" data-r="'+r[0]+'" title="Delete this record">✕</button></td></tr>').join('')+'</table>';
+ $('#rh').textContent='Operator General Expenses - GST Included'+(sid?' · shift no. '+sid+' ('+rs.length+' record'+(rs.length==1?'':'s')+')':'');
+ const hd='<tr><th>Rcrd no.</th><th>Dckt date</th><th>Dckt ref</th><th>Supplier</th><th>Description</th><th>Code</th><th class="n">Amount</th><th>GST</th><th>O/D</th><th>M</th><th>Nxt srvc</th><th>Note</th><th>Trnsctn date</th><th></th></tr>';
+ const ent=sid?'<tr><td class="mut">(New)</td><td><input form="ft" id="tdt" placeholder="dd/mm/yy" inputmode="numeric" required value="'+(sh0?fd(sh0[1]):'')+'"></td><td><input form="ft" id="trf"></td><td><select form="ft" id="tsp">'+LK.suppliers.map(x=>'<option value="'+x[0]+'">'+esc(x[1])+'</option>').join('')+'</select></td><td><input form="ft" id="tds" list="dl" required></td><td id="tcd" class="mut"></td><td><input form="ft" id="tam" type="number" step="0.01" required></td><td><input form="ft" id="tgs" type="checkbox" checked></td><td><input form="ft" id="tod" type="checkbox" checked></td><td><input form="ft" id="tm" type="checkbox"></td><td><input form="ft" id="tnx"></td><td><input form="ft" id="tnt"></td><td><button class="pri" form="ft" id="rsv">Save</button></td><td></td></tr>':'';
+ $('#tlh').innerHTML='<table style="table-layout:fixed">'+CG+hd+ent+'</table>';
+ $('#tlt').innerHTML=sid?'<b>Total Expenses: '+M2(mt)+'</b>':'';
+}
+let armed=null;
+function disarm(){if(armed){clearTimeout(armed.t);armed.reset();armed=null}}
+function arm(btn,msg,fn,box){
+ if(armed&&armed.btn===btn){clearTimeout(armed.t);const f=fn;armed.box.hidden=true;armed.reset(true);armed=null;f();return}
+ disarm();
+ const old=btn.textContent;btn.textContent=btn.dataset.lbl||'Confirm delete';btn.classList.add('dng');
+ box.innerHTML='<span>\u26A0 WARNING: '+esc(msg)+' Click the red confirm button again to go ahead, or Cancel.</span><button type="button" class="cx">Cancel</button>';box.hidden=false;
+ const reset=q=>{btn.textContent=old;btn.classList.remove('dng');box.hidden=true;if(!q&&armed&&armed.btn===btn)armed=null};
+ box.querySelector('.cx').onclick=()=>disarm();
+ armed={btn,box,reset,t:setTimeout(()=>disarm(),10000)}}
+$('#tlb').onclick=e=>{const b=e.target.closest('button.del');if(!b)return;
+ const rid=+b.dataset.r,r=P.rows.find(x=>x[0]==rid),sh=r&&SH.find(x=>x[0]==r[1]);if(!r||!sh)return;
+ arm(b,'Delete record no. '+rid+' ('+r[3]+', '+M2(r[10])+')? This record will be permanently deleted and cannot be recovered.',async()=>{
+  if(busy)return;busy=true;$('#st').textContent='Deleting…';
+  try{await DB.delRec(rid);await load();$('#st').textContent='Deleted record no. '+rid+'.'}
+  catch(x){$('#st').textContent='Could not delete: '+(x.message||x.code||x)}finally{busy=false}},$('#dwr'))};
+$('#sdel').onclick=()=>{const sid=curShift,sh=SH.find(x=>x[0]==sid);if(!sid||!sh)return;
+ const n=P.rows.filter(r=>r[1]==sid).length;
+ arm($('#sdel'),'Delete shift no. '+sid+(n?' and its '+n+' record'+(n>1?'s (including any hidden income records)':''):' (it has no records)')+'? This shift will be permanently deleted and cannot be recovered.',async()=>{
+  if(busy)return;busy=true;$('#st').textContent='Deleting…';
+  try{const i=SH.findIndex(x=>x[0]==sid),nb=SH[i+1]||SH[i-1];
+   await DB.delShift(sid);
+   mode='view';curShift=nb?nb[0]:0;await load();$('#st').textContent='Deleted shift no. '+sid+(n?' and '+n+' record'+(n>1?'s':''):'')+'.'}
+  catch(x){$('#st').textContent='Could not delete: '+(x.message||x.code||x)}finally{busy=false}},$('#dws'))};
+document.addEventListener('input',e=>{if(e.target.id=='tds')$('#tcd').textContent=cd(e.target.value)});
+$('#ft').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;try{await saveRec()}finally{busy=false}};
+async function saveRec(){
+ const sid=curShift,s=SH.find(x=>x[0]==sid);
+ if(!sid||!s){$('#st').textContent='Open or save a shift first.';return}
+ const a=+$('#tam').value,od=$('#tod').checked?1:0,gs=$('#tgs').checked?1:0;
+ $('#st').textContent='Saving…';
+ try{const no=await DB.addRec({shift_no:sid,docket_date:gv('tdt')||s[1],description:$('#tds').value.trim(),supplier_no:+$('#tsp').value,pay_method:'Cash',od,gst:gs,oprtr_g1:0,oprtr_g10:0,oprtr_g11:a,drvr_g1:0,drvr_g11:0,docket_ref:$('#trf').value.trim(),note:$('#tnt').value.trim(),m:$('#tm').checked?1:0,nxt_srvc:parseFloat($('#tnx').value)||0,transaction_date:today()});
+  await load();$('#tds').focus();$('#st').textContent='Saved record no. '+no+' on shift no. '+sid+'.'}
+ catch(x){$('#st').textContent='Could not save: '+(x.message||x.code||x)}};
+$('#fs').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;try{await saveShift()}finally{busy=false}};
+async function saveShift(){
+ const dt=gv('sdt');if(!dt){$('#st').textContent='Enter the period from date as dd/mm/yy.';return}
+ const k=qk(dt);$('#st').textContent='Saving…';
+ try{const no=await DB.addShift({date_from:dt,date_to:gv('sdt2')||dt,taxi_no:+$('#stx').value,driver_no:+$('#sdr').value,odo_start:0,odo_end:+$('#skm').value||0,shift_type:null,note:$('#snote').value.trim()||null,mdt:$('#smdt').value.trim()||null,transaction_date:today()});
+  if(!LK.quarters.includes(k)){LK.quarters.push(k);LK.quarters.sort()}
+  mode='view';curShift=no;buildPer($('#per').value=='A'?'A':'Q'+k);await load();
+  $('#st').textContent='Saved shift no. '+no+'. Now add its records below.'}
+ catch(x){$('#st').textContent='Could not save: '+(x.message||x.code||x)}};
+const nav=i=>{mode='view';idx=Math.max(0,Math.min(SH.length-1,i));showShift()};
+$('#nf').onclick=()=>nav(0);$('#np').onclick=()=>nav(mode=='new'?SH.length-1:idx-1);$('#nn').onclick=()=>nav(idx+1);$('#nl').onclick=()=>nav(SH.length-1);
+$('#nw').onclick=()=>{mode='new';showShift();$('#sdt').focus()};
+$('#gb').onclick=()=>{const n=+$('#gno').value,i=SH.findIndex(s=>s[0]==n);
+ if(!n||i<0){$('#st').textContent='Shift no. '+(n||'')+' is not in the selected period. Choose its period first.';return}
+ $('#st').textContent='';nav(i)};
+$('#gno').onkeydown=e=>{if(e.key==='Enter')$('#gb').click()};
+function tab(t){document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x.dataset.t==t));
+ ['rep','led','add'].forEach(i=>$('#'+i).hidden=i!=t);if(t=='add')showShift()}
+function go(t){const h=t==='home';$('#home').hidden=!h;$('#work').hidden=h;
+ if(!h)tab(t);window.scrollTo(0,0)}
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(b.dataset.new)mode='new';go(b.dataset.go)});
+$('#hb').onclick=()=>go('home');
+$('#per').onchange=load;
+async function start(email){
+ $('#msg').textContent='Loading…';$('#msg').hidden=false;$('#login').hidden=true;
+ try{LK=await DB.lookups();
+  if(!LK.taxis.length){$('#msg').innerHTML='This login ('+esc(email)+') is not approved to see the records. Ask the owner to approve it, or <button type="button" id="so2">sign out</button>.';$('#so2').onclick=signOut;return}
+  const[a,b]=await DB.bounds();LK.quarters=quartersBetween(a,b);
+  $('#whoe').textContent=email;$('#who').hidden=false;
+  setup();$('#msg').hidden=true;$('#app').hidden=false;await load()}
+ catch(x){$('#msg').textContent='Could not read the database: '+(x.message||x.code||x)}
+}
+async function signOut(){try{await DB.logout()}catch(e){}location.reload()}
+$('#so').onclick=signOut;
+$('#lf').onsubmit=async e=>{e.preventDefault();$('#lerr').textContent='';$('#lgo').disabled=true;
+ try{const em=await DB.login($('#lem').value.trim(),$('#lpw').value);$('#lpw').value='';await start(em)}
+ catch(x){$('#lerr').textContent=/invalid/i.test(x.message||'')?'Wrong email or password.':'Could not sign in: '+(x.message||x)}
+ finally{$('#lgo').disabled=false}};
+(async()=>{
+ DB=window.__TESTDB||REAL;
+ try{await DB.init();const em=await DB.session();
+  if(em)await start(em);else{$('#msg').hidden=true;$('#login').hidden=false}}
+ catch(x){$('#msg').textContent='Could not start: '+(x.message||x)}
+})();
+</script>
+</body></html>
